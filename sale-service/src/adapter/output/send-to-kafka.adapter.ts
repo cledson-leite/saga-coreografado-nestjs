@@ -2,10 +2,11 @@ import { Producer } from 'kafkajs';
 import { SaleEvent } from '../../application/core/domain/enums/sale-event.enum';
 import { Sale } from '../../application/core/domain/sale';
 import { SendToKafkaOutput } from '../../application/ports/output/send-to-kafka.output';
-import { Inject, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { SaleMessage } from './message/sale.message';
 
+@Injectable()
 export class SendToKafkaAdapter implements SendToKafkaOutput, OnModuleInit {
 	private producer: Producer;
 	constructor(
@@ -27,6 +28,5 @@ export class SendToKafkaAdapter implements SendToKafkaOutput, OnModuleInit {
 				},
 			],
 		});
-		await this.producer.disconnect();
 	}
 }
