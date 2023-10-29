@@ -1,4 +1,4 @@
-import { OnModuleInit, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { Producer } from 'kafkajs';
 import { SaleEvent } from '../../application/core/domain/enums/sale-event.enum';
@@ -16,9 +16,9 @@ export class SendToKafkaAdapter implements SendToKafkaOutput, OnModuleInit {
   async onModuleInit() {
     this.producer = await this.clientKafka.connect();
   }
-  async send(sale: Sale, event: SaleEvent): Promise<void> {
+  send(sale: Sale, event: SaleEvent): void {
     const msg: SaleMessage = new SaleMessage(sale, event);
-    await this.producer.send({
+    this.producer.send({
       acks: 1,
       topic: 'saga-sale',
       messages: [
