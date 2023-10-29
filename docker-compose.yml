@@ -1,36 +1,6 @@
 version: '3.7'
 
 services:
-  sale:
-    image: sale
-    ports:
-      - '8081:8081'
-    depends_on:
-      - kafka
-      - postgres-db
-    networks:
-      - coreografado
-  inventory:
-    image: inventory
-    ports:
-      - '8082:8082'
-    depends_on:
-      - kafka
-      - postgres-db
-      - sale
-    networks:
-      - coreografado
-  payment:
-    image: payment
-    ports:
-      - '8083:8083'
-    depends_on:
-      - kafka
-      - postgres-db
-      - sale
-      - inventory
-    networks:
-      - coreografado
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     networks: 
@@ -66,7 +36,7 @@ services:
     environment:
       KAFKA_BROKERCONNECT: kafka:19092
 
-  postgres-db:
+  db:
     image: postgres
     environment:
       POSTGRES_PASSWORD: "postgres"
@@ -74,6 +44,49 @@ services:
       - "5432:5432"
     networks:
       - coreografado
+
+  sale-nestjs:
+    image: sale
+    build:
+      context:  ./sale-service/
+      dockerfile: Dockerfile
+    ports:
+      - '8081:8081'
+    depends_on:
+      - kafka
+      - db
+    networks:
+      - coreografado
+
+  inventory-nestjs:
+    image: inventory
+    build:
+      context: ./inventory-service/
+      dockerfile: Dockerfile
+    ports:
+      - '8082:8082'
+    depends_on:
+      - kafka
+      - db
+      - sale-nestjs
+    networks:
+      - coreografado
+
+  payment-nestjs:
+    image: payment
+    build:
+      context:  ./payment-service/
+      dockerfile: Dockerfile
+    ports:
+      - '8083:8083'
+    depends_on:
+      - kafka
+      - db
+      - sale-nestjs
+      - inventory-nestjs
+    networks:
+      - coreografado
+  
 
 networks: 
   coreografado:

@@ -22,7 +22,7 @@ import { CancelSaleUseCase } from '../../../application/core/usecase/cancel-sale
 				transport: Transport.KAFKA,
 				options: {
 					client: {
-						brokers: ['//localhost:9092'],
+						brokers: ['kafka:19092'],
 					},
 					consumer: {
 						groupId: 'sale',

@@ -9,7 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 		ConfigModule.forRoot(),
 		TypeOrmModule.forRoot({
 			type: 'postgres',
-			url: 'postgresql://postgres:postgres@localhost:5432/saga-sales?schema=public',
+			url: 'postgresql://postgres:postgres@db:5432/saga-sales?schema=public',
 			entities: [SaleEntity],
 		}),
 		SaleModule,

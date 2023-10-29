@@ -20,7 +20,7 @@ import { CreditInventoryUseCase } from '../../../application/core/usecase/credit
         transport: Transport.KAFKA,
         options: {
           client: {
-            brokers: ['//localhost:9092'],
+            brokers: ['kafka:19092'],
           },
           consumer: {
             groupId: 'inventory',

@@ -6,8 +6,8 @@ COPY . .
 # COPY ./.env.production ./.env
 
 RUN npm install --quiet --no-optional --no-fund --loglevel=error
-# RUN npm run build
+RUN npm run build
 
 EXPOSE 8081
 
-CMD [ "npm", "run", "dev" ]
+CMD [ "npm", "run", "start:prod" ]
