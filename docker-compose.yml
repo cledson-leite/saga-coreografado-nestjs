@@ -1,6 +1,36 @@
 version: '3.7'
 
 services:
+  sale:
+    image: sale
+    ports:
+      - '8081:8081'
+    depends_on:
+      - kafka
+      - postgres-db
+    networks:
+      - coreografado
+  inventory:
+    image: inventory
+    ports:
+      - '8082:8082'
+    depends_on:
+      - kafka
+      - postgres-db
+      - sale
+    networks:
+      - coreografado
+  payment:
+    image: payment
+    ports:
+      - '8083:8083'
+    depends_on:
+      - kafka
+      - postgres-db
+      - sale
+      - inventory
+    networks:
+      - coreografado
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     networks: 

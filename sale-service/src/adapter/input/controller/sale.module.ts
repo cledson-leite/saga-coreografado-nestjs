@@ -9,6 +9,9 @@ import { SaleService } from './sale.service';
 import { SaveSaleOutput } from '../../../application/ports/output/save-sale.output';
 import { SendToKafkaOutput } from '../../../application/ports/output/send-to-kafka.output';
 import { SendToKafkaAdapter } from '../../output/send-to-kafka.adapter';
+import { FindSaleByIdAdapter } from '../../output/find-sale-by-id.adapter';
+import { FinalizeSaleUseCase } from '../../../application/core/usecase/finalize-sale.usecase';
+import { FindSaleByIdOutput } from '../../../application/ports/output/find-sale-by-id.output';
 
 @Module({
 	imports: [
@@ -18,7 +21,11 @@ import { SendToKafkaAdapter } from '../../output/send-to-kafka.adapter';
 				transport: Transport.KAFKA,
 				options: {
 					client: {
-						brokers: ['//localhost:9092'],
+						brokers: [
+							process.env.NODE_ENV === 'production'
+								? 'kafka:19092'
+								: '//localhost:9092',
+						],
 					},
 					consumer: {
 						groupId: 'sale',
@@ -36,6 +43,10 @@ import { SendToKafkaAdapter } from '../../output/send-to-kafka.adapter';
 			useClass: SaveSaleAdapter,
 		},
 		{
+			provide: FindSaleByIdAdapter,
+			useClass: FindSaleByIdAdapter,
+		},
+		{
 			provide: SendToKafkaAdapter,
 			useClass: SendToKafkaAdapter,
 		},
@@ -46,6 +57,14 @@ import { SendToKafkaAdapter } from '../../output/send-to-kafka.adapter';
 				sendToKafka: SendToKafkaOutput,
 			) => new CreateSaleUserCase(saveSale, sendToKafka),
 			inject: [SaveSaleAdapter, SendToKafkaAdapter],
+		},
+		{
+			provide: 'usecase',
+			useFactory: (
+				findUser: FindSaleByIdOutput,
+				saveSale: SaveSaleOutput,
+			) => new FinalizeSaleUseCase(findUser, saveSale),
+			inject: [FindSaleByIdAdapter, SaveSaleAdapter],
 		},
 	],
 })

@@ -4,14 +4,14 @@ import { RequestDto } from '../dto/RequestDto';
 import { FinalizeSaleInput } from '../../../application/ports/input/finalize-sale.input';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { SaleMessage } from '../../output/message/sale.message';
-import { SaleEvent } from '../../../../../payment-service/src/application/core/domain/enums/sale-event.enum';
+import { SaleEvent } from '../../../application/core/domain/enums/sale-event.enum';
 
 @Controller()
 export class SaleController {
 	private readonly logger: Logger = new Logger('Sale');
 	constructor(
 		private readonly service: SaleService,
-		@Inject('input')
+		@Inject('usecase')
 		private readonly input: FinalizeSaleInput,
 	) {}
 

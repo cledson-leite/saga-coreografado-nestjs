@@ -28,7 +28,6 @@ export class SalePaymentUseCase implements SalePaymentInput {
       sale.productId,
       sale.value,
     );
-    console.log(payment);
     this.savePayment.save(payment);
     this.kafka.send(sale, SaleEvent.VALIDATED_PAYMENT);
   }

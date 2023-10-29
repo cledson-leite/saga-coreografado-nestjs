@@ -24,7 +24,11 @@ import { FindUserByIdAdapter } from '../../output/find-user-by-id.adapter';
         transport: Transport.KAFKA,
         options: {
           client: {
-            brokers: ['//localhost:9092'],
+            brokers: [
+              process.env.NODE_ENV === 'production'
+                ? 'kafka:19092'
+                : '//localhost:9092',
+            ],
           },
           consumer: {
             groupId: 'payment',
