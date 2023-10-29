@@ -7,4 +7,7 @@ export class Inventory {
   debitQuantity(quantity: number): void {
     this.quantity -= quantity;
   }
+  creditQuantity(quantity: number): void {
+    this.quantity += quantity;
+  }
 }

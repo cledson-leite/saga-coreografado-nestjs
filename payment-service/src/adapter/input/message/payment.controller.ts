@@ -11,7 +11,7 @@ export class PaymentController {
     @Inject('input')
     private readonly input: SalePaymentInput,
   ) {}
-  @MessagePattern('saga-sale')
+  @MessagePattern('saga-inventory')
   debit(@Payload() message: SaleMessage) {
     const { sale, event } = message;
     if (SaleEvent.UPDATED_INVENTORY === event) {

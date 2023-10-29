@@ -10,11 +10,7 @@ async function bootstrap() {
 		transport: Transport.KAFKA,
 		options: {
 			client: {
-				brokers: [
-					process.env.NODE_ENV === 'production'
-						? 'kafka:19092'
-						: '//localhost:9092',
-				],
+				brokers: ['//localhost:9092'],
 			},
 			consumer: {
 				groupId: 'sale',

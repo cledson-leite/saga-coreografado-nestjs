@@ -12,6 +12,7 @@ import { SendToKafkaAdapter } from '../../output/send-to-kafka.adapter';
 import { FindSaleByIdAdapter } from '../../output/find-sale-by-id.adapter';
 import { FinalizeSaleUseCase } from '../../../application/core/usecase/finalize-sale.usecase';
 import { FindSaleByIdOutput } from '../../../application/ports/output/find-sale-by-id.output';
+import { CancelSaleUseCase } from '../../../application/core/usecase/cancel-sale.usecase';
 
 @Module({
 	imports: [
@@ -21,11 +22,7 @@ import { FindSaleByIdOutput } from '../../../application/ports/output/find-sale-
 				transport: Transport.KAFKA,
 				options: {
 					client: {
-						brokers: [
-							process.env.NODE_ENV === 'production'
-								? 'kafka:19092'
-								: '//localhost:9092',
-						],
+						brokers: ['//localhost:9092'],
 					},
 					consumer: {
 						groupId: 'sale',
@@ -64,6 +61,14 @@ import { FindSaleByIdOutput } from '../../../application/ports/output/find-sale-
 				findUser: FindSaleByIdOutput,
 				saveSale: SaveSaleOutput,
 			) => new FinalizeSaleUseCase(findUser, saveSale),
+			inject: [FindSaleByIdAdapter, SaveSaleAdapter],
+		},
+		{
+			provide: 'rollback',
+			useFactory: (
+				findUser: FindSaleByIdOutput,
+				saveSale: SaveSaleOutput,
+			) => new CancelSaleUseCase(findUser, saveSale),
 			inject: [FindSaleByIdAdapter, SaveSaleAdapter],
 		},
 	],

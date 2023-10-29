@@ -20,7 +20,7 @@ export class SendToKafkaAdapter implements SendToKafkaOutput, OnModuleInit {
     const msg: SaleMessage = new SaleMessage(sale, event);
     this.producer.send({
       acks: 1,
-      topic: 'saga-sale',
+      topic: 'saga-payment',
       messages: [
         {
           key: `${Math.random() * 100}`,

@@ -16,19 +16,23 @@ export class SalePaymentUseCase implements SalePaymentInput {
     private readonly kafka: SendToKafkaOutput,
   ) {}
   async payment(sale: Sale): Promise<void> {
-    const user = await this.findUser.find(sale.userId);
-    if (user.balance < sale.value) {
-      throw new BadRequestException('Saldo insuficiente');
+    try {
+      const user = await this.findUser.find(sale.userId);
+      if (user.balance < sale.value) {
+        throw new BadRequestException('Saldo insuficiente');
+      }
+      user.debitBalance(sale.value);
+      this.updateUser.update(user);
+      const payment = new Payment(
+        sale.userId,
+        sale.id,
+        sale.productId,
+        sale.value,
+      );
+      this.savePayment.save(payment);
+      this.kafka.send(sale, SaleEvent.VALIDATED_PAYMENT);
+    } catch (error: any) {
+      this.kafka.send(sale, SaleEvent.FAILED_PAYMENT);
     }
-    user.debitBalance(sale.value);
-    this.updateUser.update(user);
-    const payment = new Payment(
-      sale.userId,
-      sale.id,
-      sale.productId,
-      sale.value,
-    );
-    this.savePayment.save(payment);
-    this.kafka.send(sale, SaleEvent.VALIDATED_PAYMENT);
   }
 }

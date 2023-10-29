@@ -14,12 +14,18 @@ export class DebitInventoryUseCase implements DebitInventoryInput {
     private readonly kafka: SendToKafkaOutput,
   ) {}
   async debit(sale: Sale): Promise<void> {
-    const inventory: Inventory = await this.findInventory.find(sale.productId);
-    if (inventory.quantity < sale.quantity) {
-      throw new BadRequestException('Estoque insuficiente');
+    try {
+      const inventory: Inventory = await this.findInventory.find(
+        sale.productId,
+      );
+      if (inventory.quantity < sale.quantity) {
+        throw new BadRequestException('Estoque insuficiente');
+      }
+      inventory.debitQuantity(sale.quantity);
+      this.updateInventory.update(inventory);
+      this.kafka.send(sale, SaleEvent.UPDATED_INVENTORY);
+    } catch (error) {
+      this.kafka.send(sale, SaleEvent.ROLLBACK_INVENTORY);
     }
-    inventory.debitQuantity(sale.quantity);
-    this.updateInventory.update(inventory);
-    this.kafka.send(sale, SaleEvent.UPDATED_INVENTORY);
   }
 }

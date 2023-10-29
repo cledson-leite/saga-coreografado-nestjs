@@ -5,6 +5,7 @@ import { FinalizeSaleInput } from '../../../application/ports/input/finalize-sal
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { SaleMessage } from '../../output/message/sale.message';
 import { SaleEvent } from '../../../application/core/domain/enums/sale-event.enum';
+import { CancelSaleInput } from '../../../application/ports/input/cancel-sale.input';
 
 @Controller()
 export class SaleController {
@@ -13,6 +14,8 @@ export class SaleController {
 		private readonly service: SaleService,
 		@Inject('usecase')
 		private readonly input: FinalizeSaleInput,
+		@Inject('rollback')
+		private readonly rollback: CancelSaleInput,
 	) {}
 
 	@Post('/api/v1/sale')
@@ -22,13 +25,22 @@ export class SaleController {
 		this.service.createSale(request);
 		this.logger.log('Venda registrada com sucesso!!');
 	}
-	@MessagePattern('saga-sale')
+	@MessagePattern('saga-payment')
 	finalize(@Payload() message: SaleMessage): void {
 		const { sale, event } = message;
 		if (SaleEvent.VALIDATED_PAYMENT === event) {
 			this.logger.log('Iniciando finalização ...');
 			this.input.finalize(sale);
 			this.logger.log('Venda registrada com sucesso!!');
+		}
+	}
+	@MessagePattern('saga-inventory')
+	cancel(@Payload() message: SaleMessage): void {
+		const { sale, event } = message;
+		if (SaleEvent.ROLLBACK_INVENTORY === event) {
+			this.logger.log('Iniciando cancelamento da venda ...');
+			this.rollback.cancel(sale);
+			this.logger.log('Venda cancelada');
 		}
 	}
 }

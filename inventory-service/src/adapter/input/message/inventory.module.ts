@@ -10,6 +10,7 @@ import { FindInventoryByProductIdAdapter } from '../../output/find-inventory-by-
 import { SendToKafkaAdapter } from '../../output/send-to-kafka.adapter';
 import { UpdateInventoryAdapter } from '../../output/update-inventory.adapter';
 import { InventoryController } from './inventory.controller';
+import { CreditInventoryUseCase } from '../../../application/core/usecase/credit-inventory.usecase';
 
 @Module({
   imports: [
@@ -19,11 +20,7 @@ import { InventoryController } from './inventory.controller';
         transport: Transport.KAFKA,
         options: {
           client: {
-            brokers: [
-              process.env.NODE_ENV === 'production'
-                ? 'kafka:19092'
-                : '//localhost:9092',
-            ],
+            brokers: ['//localhost:9092'],
           },
           consumer: {
             groupId: 'inventory',
@@ -55,6 +52,20 @@ import { InventoryController } from './inventory.controller';
         sendToKafka: SendToKafkaOutput,
       ) =>
         new DebitInventoryUseCase(findInventory, updateInventory, sendToKafka),
+      inject: [
+        FindInventoryByProductIdAdapter,
+        UpdateInventoryAdapter,
+        SendToKafkaAdapter,
+      ],
+    },
+    {
+      provide: 'usecase',
+      useFactory: (
+        findInventory: FindInventoryByProductIdOutput,
+        updateInventory: UpdateInventoryOutput,
+        sendToKafka: SendToKafkaOutput,
+      ) =>
+        new CreditInventoryUseCase(findInventory, updateInventory, sendToKafka),
       inject: [
         FindInventoryByProductIdAdapter,
         UpdateInventoryAdapter,
