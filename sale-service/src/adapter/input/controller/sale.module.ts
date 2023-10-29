@@ -20,6 +20,9 @@ import { SendToKafkaAdapter } from '../../output/send-to-kafka.adapter';
 					client: {
 						brokers: ['//localhost:9092'],
 					},
+					consumer: {
+						groupId: 'sale',
+					},
 				},
 			},
 		]),

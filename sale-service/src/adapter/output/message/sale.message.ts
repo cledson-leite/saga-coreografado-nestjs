@@ -3,7 +3,7 @@ import { Sale } from '../../../application/core/domain/sale';
 
 export class SaleMessage {
 	constructor(
-		private sale: Sale,
-		private event: SaleEvent,
+		public sale: Sale,
+		public event: SaleEvent,
 	) {}
 }
